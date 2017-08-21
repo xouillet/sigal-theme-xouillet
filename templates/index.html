@@ -81,13 +81,13 @@
 
         {% if album.medias %}
         <div id="gallery">
-          {% set i=0 %}
+          {% set i=[] %}
           {% for media in album.medias %}
             {% if media.type == "image" %}
                 <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
                     data-title="{{ media.title if media.title else media.filename }}"
-                    {% if media.big %} data-big="{{ media.big }}"{% endif %} class="image" style="width: {{ w }}px; height: {{ h }}px" onclick="open_pw({{ i }})" />
-                {% set i=i+1 %}
+                    {% if media.big %} data-big="{{ media.big }}"{% endif %} class="image" style="width: {{ w }}px; height: {{ h }}px" onclick="open_pw({{ i | length }})" />
+                {% set _=i.append(1) %}
             {% endif %}
           {% endfor %}
         </div>
