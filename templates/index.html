@@ -166,6 +166,23 @@
             gallery.init();
         }
 
+        //  Parse URL and open gallery if it contains #&pid=3&gid=1
+        var hash = window.location.hash.substring(1),
+        params = {};
+        var vars = hash.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            if(!vars[i]) {
+                continue;
+            }
+            var pair = vars[i].split('=');  
+            if(pair.length < 2) {
+                continue;
+            }           
+            params[pair[0]] = pair[1];
+        }
+        if(params.pid) {
+            open_pw( params.pid );
+        }
     </script>
 {% endif %}
 
