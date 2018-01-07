@@ -64,6 +64,12 @@
                     data-title="{{ media.title if media.title else media.filename }}"
                     {% if media.big %} data-big="{{ media.big }}"{% endif %} class="image" style="width: {{ w }}px; height: {{ h }}px" onclick="open_pw({{ i | length }})" />
                 {% set _=i.append(1) %}
+            {% else %}
+               <a href="{{ media.filename }}">
+                <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
+                    data-title="{{ media.title if media.title else media.filename }}"
+                    {% if media.big %} data-big="{{ media.big }}"{% endif %} class="image" style="width: {{ w }}px; height: {{ h }}px" />
+                </a>
             {% endif %}
           {% endfor %}
         </div>
