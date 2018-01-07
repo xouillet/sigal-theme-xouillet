@@ -49,30 +49,6 @@
       {% endif %}
 
       <div id="main" role="main">
-        {% if album.albums %}
-        <div id="albums">
-          <!-- <h1>Albums</h1> -->
-          <ul>
-            {% for alb in album.albums %}
-            {% if not 'hide' in alb.meta %}
-            <li style="width: {{ w }}px"><a href="{{ alb.url }}">
-              <div class="album_animation" style="width: {{ w }}px; height: {{ h }}px">
-                <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
-                <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
-                {% if 'thumbnail' in alb.meta %}
-                    <img src="{{ alb.thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
-                {% else %}
-                    <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
-                {% endif %}
-              </div></a>
-              <div class="album_title">{{ alb.title }}{% if 'date' in alb.meta %}<br/><span class="album_date">{{ alb.meta.date.0|date_reformat('%d %B %Y') }}{% endif %}</span></div>
-            </li>
-            {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-        {% endif %}
-
         {% if album.description %}
         <div id="description">
           {{ album.description }}
@@ -101,6 +77,31 @@
           </p>
         </div>
         {% endif %}
+
+        {% if album.albums %}
+        <div id="albums">
+          <!-- <h1>Albums</h1> -->
+          <ul>
+            {% for alb in album.albums %}
+            {% if not 'hide' in alb.meta %}
+            <li style="width: {{ w }}px"><a href="{{ alb.url }}">
+              <div class="album_animation" style="width: {{ w }}px; height: {{ h }}px">
+                <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+                <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+                {% if 'thumbnail' in alb.meta %}
+                    <img src="{{ alb.thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+                {% else %}
+                    <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+                {% endif %}
+              </div></a>
+              <div class="album_title">{{ alb.title }}{% if 'date' in alb.meta %}<br/><span class="album_date">{{ alb.meta.date.0|date_reformat('%d %B %Y') }}{% endif %}</span></div>
+            </li>
+            {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
 
       </div>
 
