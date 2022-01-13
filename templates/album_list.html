@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+{% set w, h = settings.thumb_size.0, settings.thumb_size.1 %}
+<div id="albums">
+  <ul>
+    {% for alb in album.albums %}
+    {% if not 'hide' in alb.meta %}
+    <li style="width: {{ w }}px">
+      <a href="{{ alb.url }}">
+        <div class="album_animation" style="width: {{ w }}px; height: {{ h }}px">
+          <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+          <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+          {% if 'thumbnail' in alb.meta %}
+              <img src="{{ alb.thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+          {% else %}
+              <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+          {% endif %}
+        </div>
+      </a>
+      <div class="album_title">{{ alb.title }}{% if 'date' in alb.meta %}<br/><span class="album_date">{{ alb.meta.date.0|date_reformat('%d %B %Y') }}{% endif %}</span></div>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
