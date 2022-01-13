@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+{% if album.medias %}
+    {% include "gallery.html" %}
+{% endif %}
+
 {% set w, h = settings.thumb_size.0, settings.thumb_size.1 %}
 <div id="albums">
   <ul>
