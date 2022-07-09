@@ -9,11 +9,13 @@
       <a href="{{ media.big if media.big else media.url }}" 
        data-pswp-src="{{ media.url }}" data-pswp-width="{{ media.size.width }}" data-pswp-height="{{ media.size.height }}"
        {% if media.big %} data-big="{{ media.big }}"{% endif %}
+       data-pswp-type="{{ 'pano' if media.xmp | is_pano else 'image' }}"
        data-cropped="true"
        target="_blank">
          <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
            data-title="{{ media.title if media.title else media.filename }}"
            class="image" style="width: {{ w }}px; height: {{ h }}px; object-fit:cover" />
+         {% if not media.xmp | is_pano %}
          <span class="pswp-caption-content">
             {%- if media.description %}<p>{{ media.description }}</p>{% endif %}
             {%- if media.exif %}
@@ -37,6 +39,7 @@
             </div>
             {% endif %}
         </span>
+        {% endif %}
       </a>
     {% endfor %}
   </div>
@@ -51,6 +54,9 @@
   {% endif %}
 </div>
 
+<script src="{{ theme.url }}/photo-sphere-viewer/three.min.js"></script>
+<script src="{{ theme.url }}/photo-sphere-viewer/browser.js"></script>
+<script src="{{ theme.url }}/photo-sphere-viewer/photo-sphere-viewer.min.js"></script>
 <script type="module">
     import PhotoSwipeLightbox from './{{ theme.url }}/photoswipe/photoswipe-lightbox.esm.min.js';
     import PhotoSwipeDynamicCaption from './{{ theme.url }}/photoswipe/photoswipe-dynamic-caption-plugin.esm.js';
@@ -113,7 +119,33 @@
         }
       });
     });
-    
+
+    /* Pano */
+    lightbox.on('contentLoad', (e) => {
+        const { content } = e;
+        if (content.type === 'pano') {
+          e.preventDefault();
+          content.element = document.createElement('div');
+          const viewer = document.createElement('div');
+          viewer.className = "photosphere-viewer"
+          content.element.appendChild(viewer);
+          content.psviewer = new PhotoSphereViewer.Viewer({container: viewer, panorama: content.data.element.href, size: {width: 1920, height: 1080}});
+       }
+    });
+
+    lightbox.on('contentAppend', (e) => {
+        const { content } = e;
+        if (content.type === 'pano') {
+            window.dispatchEvent(new Event('resize'));
+        }
+    });
+
+    lightbox.on('pointerDown', (e) => {
+        if (lightbox.pswp.currSlide.content.psviewer) {
+            e.preventDefault();
+        }
+    });
+
     /* Start */
     lightbox.init();
 </script>

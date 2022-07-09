@@ -168,3 +168,13 @@ footer a:hover {
 #gallery a {
     text-decoration: none;
 }
+
+.photosphere-viewer {
+  width: 1920px;
+  height: 1080px;
+  pointer-events: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
