@@ -4,21 +4,40 @@
   <div id="description">{{ album.description }}</div>
   {% endif %}
 
-  <div id="gallery">
-    {% set i=[] %}
+  <div id="gallery" class="pswp-gallery">
     {% for media in album.medias %}
-      {% if media.type == "image" %}
-          <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
-              data-title="{{ media.title if media.title else media.filename }}"
-              {% if media.big %} data-big="{{ media.big }}"{% endif %} class="image" style="width: {{ w }}px; height: {{ h }}px" onclick="open_pw({{ i | length }})" />
-          {% set _=i.append(1) %}
-      {% else %}
-         <a href="{{ media.filename }}">
-          <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
-              data-title="{{ media.title if media.title else media.filename }}"
-              {% if media.big %} data-big="{{ media.big }}"{% endif %} class="image" style="width: {{ w }}px; height: {{ h }}px" />
-          </a>
-      {% endif %}
+      <a href="{{ media.big if media.big else media.url }}" 
+       data-pswp-src="{{ media.url }}" data-pswp-width="{{ media.size.width }}" data-pswp-height="{{ media.size.height }}"
+       {% if media.big %} data-big="{{ media.big }}"{% endif %}
+       data-cropped="true"
+       target="_blank">
+         <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
+           data-title="{{ media.title if media.title else media.filename }}"
+           class="image" style="width: {{ w }}px; height: {{ h }}px; object-fit:cover" />
+         <span class="pswp-caption-content">
+            {%- if media.description %}<p>{{ media.description }}</p>{% endif %}
+            {%- if media.exif %}
+            <div style="display: inline-block">
+              {% if media.exif.datetime %}
+                Date: {{ media.exif.datetime }}<br/>
+              {% endif %}
+              <span style="font-size: 12px">
+              {% if media.exif.Model %}Model: {{ media.exif.Model }}, {% endif %}
+              {% if media.exif.iso %}ISO: {{ media.exif.iso }}, {% endif %}
+              {% if media.exif.focal %}Focal: {{ media.exif.focal }}, {% endif %}
+              {% if media.exif.exposure %}Exposure: {{ media.exif.exposure }}, {% endif %}
+              {% if media.exif.fstop %}Fstop: {{ media.exif.fstop }}{% endif %}
+              {% if media.exif.gps %}
+                <br/>Location: <a href='https://www.openstreetmap.org/?mlat={{
+                media.exif.gps.lat }}&amp;mlon={{ media.exif.gps.lon}}&amp;zoom=12&amp;layers=M' target='_blank' class='map'
+                >{{ 'N{:.6f}'.format(media.exif.gps.lat) if media.exif.gps.lat > 0 else 'S{:.6f}'.format(-media.exif.gps.lat) }}
+                 {{ 'E{:.6f}'.format(media.exif.gps.lon) if media.exif.gps.lon > 0 else 'W{:.6f}'.format(-media.exif.gps.lon) }}</a>
+              {% endif %}
+              </span>
+            </div>
+            {% endif %}
+        </span>
+      </a>
     {% endfor %}
   </div>
 
@@ -30,76 +49,71 @@
     </p>
   </div>
   {% endif %}
-
-{% macro img_description(media) %}
-{%- if media.big %}<div style="margin-right: 20px;"><a style="color: #fff" href='{{ media.big }}'>Full size</a></div>{% endif %}
-{%- if media.description %}<p>{{ media.description }}</p>{% endif %}
-{%- if media.exif %}
-<div style="display: inline-block">
-  {% if media.exif.datetime %}
-    Date: {{ media.exif.datetime }}<br/>
-  {% endif %}
-  <span style="font-size: 10px">
-  {% if media.exif.iso %}ISO: {{ media.exif.iso }}, {% endif %}
-  {% if media.exif.focal %}Focal: {{ media.exif.focal }}, {% endif %}
-  {% if media.exif.exposure %}Exposure: {{ media.exif.exposure }}, {% endif %}
-  {% if media.exif.fstop %}Fstop: {{ media.exif.fstop }}{% endif %}
-  {% if media.exif.gps %}
-    <br/>Location: <a href='https://www.openstreetmap.org/?mlat={{
-    media.exif.gps.lat }}&amp;mlon={{ media.exif.gps.lon}}&amp;zoom=12&amp;layers=M' target='_blank' class='map'
-    >{{ 'N{:.6f}'.format(media.exif.gps.lat) if media.exif.gps.lat > 0 else 'S{:.6f}'.format(-media.exif.gps.lat) }}
-     {{ 'E{:.6f}'.format(media.exif.gps.lon) if media.exif.gps.lon > 0 else 'W{:.6f}'.format(-media.exif.gps.lon) }}</a>
-  {% endif %}
-  </span>
 </div>
-{% endif %}
-{%- endmacro %}
 
-{% include 'photoswipe.html' %}
-<script src="{{ theme.url }}/photoswipe/photoswipe.min.js"></script>
-<script src="{{ theme.url }}/photoswipe/photoswipe-ui-default.min.js"></script>
-<script>
-    function open_pw(idx) {
-        var pswpElement = document.querySelectorAll('.pswp')[0];
-        var items = [
-          {% for media in album.medias %}
-            {% if media.type == "image" %}
-            { msrc: '{{ media.thumbnail }}',
-              src: '{{ media.url }}',
-              w: '{{ media.size['width'] }}',
-              h: '{{ media.size['height'] }}',
-              title: `{{ img_description(media) }}`
-            }{% if not loop.last %},{% endif %}
-            {% endif %}
-         {% endfor %}
-         ];
+<script type="module">
+    import PhotoSwipeLightbox from './{{ theme.url }}/photoswipe/photoswipe-lightbox.esm.min.js';
+    import PhotoSwipeDynamicCaption from './{{ theme.url }}/photoswipe/photoswipe-dynamic-caption-plugin.esm.js';
+    
+    const lightbox = new PhotoSwipeLightbox({
+      // may select multiple "galleries"
+      gallery: '#gallery',
+      // Elements within gallery (slides)
+      children: 'a',
+      // setup PhotoSwipe Core dynamic import
+      pswpModule: () => import('./{{ theme.url }}/photoswipe/photoswipe.esm.min.js'),
+      // Animation
+      showAnimationDuration: 500,
+      hideAnimationDuration: 500,
+    });
 
-        var options = {
-            index: idx,
-            bgOpacity: 0.9,
-            closeOnScroll: false,
-            shareEl: false,
-        };
+    /* Nice animation */
+    const backEasing = {
+      in: 'cubic-bezier(0.6, -0.28, 0.7, 1)',
+      out: 'cubic-bezier(0.3, 0, 0.32, 1.275)',
+      inOut: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+    };
+    lightbox.on('firstUpdate', () => {
+      lightbox.pswp.options.easing = backEasing.out;
+    });
+    lightbox.on('initialZoomInEnd', () => {
+      lightbox.pswp.options.easing = backEasing.inOut;
+    });
+    lightbox.on('close', () => {
+      lightbox.pswp.options.easing = backEasing.in;
+    });
 
-        var gallery = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options);
-        gallery.init();
-    }
-
-    //  Parse URL and open gallery if it contains #&pid=3&gid=1
-    var hash = window.location.hash.substring(1),
-    params = {};
-    var vars = hash.split('&');
-    for (var i = 0; i < vars.length; i++) {
-        if(!vars[i]) {
-            continue;
+    /* Caption */
+    const captionPlugin = new PhotoSwipeDynamicCaption(lightbox, {
+        type: 'auto',
+    });
+    
+    /* Download button */
+    lightbox.on('uiRegister', function() {
+      lightbox.pswp.ui.registerElement({
+        name: 'download-button',
+        order: 8,
+        isButton: true,
+        tagName: 'a',
+    
+        // SVG with outline
+        html: {
+          isCustomSVG: true,
+          inner: '<path d="M20.5 14.3 17.1 18V10h-2.2v7.9l-3.4-3.6L10 16l6 6.1 6-6.1ZM23 23H9v2h14Z" id="pswp__icn-download"/>',
+          outlineID: 'pswp__icn-download'
+        },
+    
+        onInit: (el, pswp) => {
+          el.setAttribute('target', '_blank');
+          el.setAttribute('rel', 'noopener');
+    
+          pswp.on('change', () => {
+            el.href = pswp.currSlide.data.element.href;
+          });
         }
-        var pair = vars[i].split('=');  
-        if(pair.length < 2) {
-            continue;
-        }           
-        params[pair[0]] = pair[1];
-    }
-    if(params.pid) {
-        open_pw( params.pid );
-    }
+      });
+    });
+    
+    /* Start */
+    lightbox.init();
 </script>
