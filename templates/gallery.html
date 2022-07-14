@@ -7,10 +7,12 @@
   <div id="gallery" class="pswp-gallery">
     {% for media in album.medias %}
       <a href="{{ media.big if media.big else media.url }}" 
+       {%- if media.type == "image" %}
        data-pswp-src="{{ media.url }}" data-pswp-width="{{ media.size.width }}" data-pswp-height="{{ media.size.height }}"
        {% if media.big %} data-big="{{ media.big }}"{% endif %}
        data-is-pano="{{ 'true' if media.xmp | is_pano else 'false' }}"
        data-cropped="true"
+       {% endif %}
        target="_blank">
          <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
            data-title="{{ media.title if media.title else media.filename }}"
@@ -57,6 +59,7 @@
 <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
 
 <script type="module">
+    import PhotoSwipe from './{{ theme.url }}/photoswipe/photoswipe.esm.min.js';
     import PhotoSwipeLightbox from './{{ theme.url }}/photoswipe/photoswipe-lightbox.esm.min.js';
     import PhotoSwipeDynamicCaption from './{{ theme.url }}/photoswipe/photoswipe-dynamic-caption-plugin.esm.js';
     
@@ -66,7 +69,7 @@
       // Elements within gallery (slides)
       children: 'a',
       // setup PhotoSwipe Core dynamic import
-      pswpModule: () => import('./{{ theme.url }}/photoswipe/photoswipe.esm.min.js'),
+      pswpModule: () => PhotoSwipe,
       // Animation
       showAnimationDuration: 500,
       hideAnimationDuration: 500,

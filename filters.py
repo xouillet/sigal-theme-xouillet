@@ -11,7 +11,5 @@ def date_reformat(value, format_to):
 def is_pano(value):
     try:
         return value['xmpmeta']['RDF']['Description']['UsePanoramaViewer'] == "True"
-    except jinja2.exceptions.UndefinedError:
-        return False
-    except KeyError:
+    except:
         return False

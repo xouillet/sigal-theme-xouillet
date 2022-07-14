@@ -12,12 +12,12 @@
     <li style="width: {{ w }}px">
       <a href="{{ alb.url }}">
         <div class="album_animation" style="width: {{ w }}px; height: {{ h }}px">
-          <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
-          <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+          <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px; object-fit: cover;"/>
+          <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px; object-fit: cover;"/>
           {% if 'thumbnail' in alb.meta %}
-              <img src="{{ alb.thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+              <img src="{{ alb.thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px; object-fit: cover;"/>
           {% else %}
-              <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px"/>
+              <img src="{{ alb.random_thumbnail }}" class="album_thumb" alt="{{ alb.name }}" title="{{ alb.name }}" style="width: {{ w }}px; height: {{ h }}px; object-fit: cover;"/>
           {% endif %}
         </div>
       </a>
