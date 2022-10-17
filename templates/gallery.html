@@ -54,14 +54,16 @@
   {% endif %}
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
+
+<script src="{{ theme.url }}/photo-sphere-viewer/three.min.js"></script>
+<script src="{{ theme.url }}/photo-sphere-viewer/browser.js"></script>
+<script src="{{ theme.url }}/photo-sphere-viewer/photo-sphere-viewer.min.js"></script>
 
 <script type="module">
     import PhotoSwipe from './{{ theme.url }}/photoswipe/photoswipe.esm.min.js';
     import PhotoSwipeLightbox from './{{ theme.url }}/photoswipe/photoswipe-lightbox.esm.min.js';
     import PhotoSwipeDynamicCaption from './{{ theme.url }}/photoswipe/photoswipe-dynamic-caption-plugin.esm.js';
+    import PhotoSwipeFullscreen from './{{ theme.url }}/photoswipe/photoswipe-fullscreen.esm.min.js';
     
     const lightbox = new PhotoSwipeLightbox({
       // may select multiple "galleries"
@@ -74,6 +76,7 @@
       showAnimationDuration: 500,
       hideAnimationDuration: 500,
     });
+    const fullscreenPlugin = new PhotoSwipeFullscreen(lightbox);
 
     /* Nice animation */
     const backEasing = {
