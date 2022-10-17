@@ -9,13 +9,12 @@
       <a href="{{ media.big if media.big else media.url }}" 
        data-pswp-src="{{ media.url }}" data-pswp-width="{{ media.size.width }}" data-pswp-height="{{ media.size.height }}"
        {% if media.big %} data-big="{{ media.big }}"{% endif %}
-       data-pswp-type="{{ 'pano' if media.xmp | is_pano else 'image' }}"
+       data-is-pano="{{ 'true' if media.xmp | is_pano else 'false' }}"
        data-cropped="true"
        target="_blank">
          <img src="{{ media.thumbnail }}" alt="{{ media.filename }}"
            data-title="{{ media.title if media.title else media.filename }}"
            class="image" style="width: {{ w }}px; height: {{ h }}px; object-fit:cover" />
-         {% if not media.xmp | is_pano %}
          <span class="pswp-caption-content">
             {%- if media.description %}<p>{{ media.description }}</p>{% endif %}
             {%- if media.exif %}
@@ -37,7 +36,6 @@
               {% endif %}
               </span>
             </div>
-            {% endif %}
         </span>
         {% endif %}
       </a>
@@ -54,9 +52,10 @@
   {% endif %}
 </div>
 
-<script src="{{ theme.url }}/photo-sphere-viewer/three.min.js"></script>
-<script src="{{ theme.url }}/photo-sphere-viewer/browser.js"></script>
-<script src="{{ theme.url }}/photo-sphere-viewer/photo-sphere-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
+
 <script type="module">
     import PhotoSwipeLightbox from './{{ theme.url }}/photoswipe/photoswipe-lightbox.esm.min.js';
     import PhotoSwipeDynamicCaption from './{{ theme.url }}/photoswipe/photoswipe-dynamic-caption-plugin.esm.js';
@@ -121,22 +120,51 @@
     });
 
     /* Pano */
-    lightbox.on('contentLoad', (e) => {
-        const { content } = e;
-        if (content.type === 'pano') {
-          e.preventDefault();
-          content.element = document.createElement('div');
-          const viewer = document.createElement('div');
-          viewer.className = "photosphere-viewer"
-          content.element.appendChild(viewer);
-          content.psviewer = new PhotoSphereViewer.Viewer({container: viewer, panorama: content.data.element.href, size: {width: 1920, height: 1080}});
-       }
+    // parse data-is-pano attribute
+    lightbox.addFilter('itemData', (itemData, index) => {
+      itemData.isPano = itemData.element.dataset.isPano == "true";
+      return itemData;
     });
 
     lightbox.on('contentAppend', (e) => {
         const { content } = e;
-        if (content.type === 'pano') {
-            window.dispatchEvent(new Event('resize'));
+        if (content.data.isPano) {
+            e.preventDefault();
+            const div = document.createElement('div');
+
+            /* overlay */
+            content.overlay = document.createElement('div');
+            content.overlay.className = "pano-overlay"
+            content.overlay.style.width = content.element.style.width;
+            content.overlay.style.height = content.element.style.height;
+
+            const overlaytext = document.createElement('div');
+            overlaytext.className = "pano-overlay-text";
+            overlaytext.textContent = "Cliquer ici pour activer le panorama";
+            content.overlay.appendChild(overlaytext);
+
+            /* dom */
+            div.appendChild(content.overlay);
+            div.appendChild(content.element);
+
+            /* events */
+            div.onmouseover = () => { content.overlay.style.display = "block";  };
+            div.onmouseleave = () => { content.overlay.style.display = "none";  };
+            content.overlay.onclick = () => {
+                const viewer = document.createElement('div');
+                viewer.className = "photosphere-viewer"
+                div.appendChild(viewer);
+                content.psviewer = new PhotoSphereViewer.Viewer({container: viewer, panorama: content.data.element.href, size: {width: content.element.style.width, height: content.element.style.height}});
+                content.overlay.style.display = "none";
+                div.onmouseover = null;
+            };
+            content.slide.container.appendChild(div);
+        }
+    });
+    lightbox.on('contentActivate', ({ content }) => {
+        if (content.overlay) {
+          content.overlay.style.width = content.element.style.width;
+          content.overlay.style.height = content.element.style.height;
         }
     });
 

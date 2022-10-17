@@ -170,11 +170,37 @@ footer a:hover {
 }
 
 .photosphere-viewer {
-  width: 1920px;
-  height: 1080px;
   pointer-events: auto;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  width: 1920px;
+  height: 1080px;
+
+}
+
+.photosphere-viewer * {
+    box-sizing: content-box !important;
+}
+
+.pano-overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+.pano-overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 50px;
+  color: white;
+  transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
 }
