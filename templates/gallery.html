@@ -10,7 +10,7 @@
        {%- if media.type == "image" %}
        data-pswp-src="{{ media.url }}" data-pswp-width="{{ media.size.width }}" data-pswp-height="{{ media.size.height }}"
        {% if media.big %} data-big="{{ media.big }}"{% endif %}
-       data-is-pano="{{ 'true' if media.xmp | is_pano else 'false' }}"
+       data-pano-data="{{ media | panodata }}"
        data-cropped="true"
        {% endif %}
        target="_blank">
@@ -128,13 +128,13 @@
     /* Pano */
     // parse data-is-pano attribute
     lightbox.addFilter('itemData', (itemData, index) => {
-      itemData.isPano = itemData.element.dataset.isPano == "true";
+      itemData.panoData = JSON.parse(itemData.element.dataset.panoData);
       return itemData;
     });
 
     lightbox.on('contentAppend', (e) => {
         const { content } = e;
-        if (content.data.isPano) {
+        if (content.data.panoData) {
             e.preventDefault();
             const div = document.createElement('div');
 
@@ -160,7 +160,8 @@
                 const viewer = document.createElement('div');
                 viewer.className = "photosphere-viewer"
                 div.appendChild(viewer);
-                content.psviewer = new PhotoSphereViewer.Viewer({container: viewer, panorama: content.data.element.href, size: {width: content.element.style.width, height: content.element.style.height}});
+                console.log(content.data);
+                content.psviewer = new PhotoSphereViewer.Viewer({container: viewer, panorama: content.data.src, size: {width: content.element.style.width, height: content.element.style.height}, panoData: content.data.panoData});
                 content.overlay.style.display = "none";
                 div.onmouseover = null;
             };
